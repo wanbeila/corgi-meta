@@ -1,0 +1,24 @@
+server:
+  port: 9999
+  servlet:
+    context-path: /corgi-meta
+spring:
+  application:
+    name: corgi-meta
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/corgi_meta?useUnicode=true&characterEncoding=utf-8&serverTimezone=UTC
+    username: root
+    password: egova
+  liquibase:
+    change-log: db/changelog/database-changelog.yaml
+  security:
+    user:
+      name: admin
+      password: admin
+logging:
+  file:
+    name: corgi-meta.log
+    path: logs/
+  level:
+    root: debug
