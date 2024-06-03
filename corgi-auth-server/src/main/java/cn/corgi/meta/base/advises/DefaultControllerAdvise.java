@@ -35,11 +35,24 @@ public class DefaultControllerAdvise implements ResponseBodyAdvice<Object> {
 
     @Override
     public Object beforeBodyWrite(Object body, MethodParameter returnType, MediaType selectedContentType, Class<? extends HttpMessageConverter<?>> selectedConverterType, ServerHttpRequest request, ServerHttpResponse response) {
+        if (null == body) {
+            return ResultInfo.newInstance();
+        }
+
+        String requestUri = request.getURI().toString();
+
+        if (requestUri.contains("swagger") || requestUri.startsWith("/actuator") || requestUri.endsWith("api-docs")) {
+            return body;
+        }
+
         if (body instanceof ResultInfo) {
             return body;
-        } else {
+        } else if (body instanceof String) {
             ResultInfo resultInfo = ResultInfo.newInstance();
             return new Gson().toJson(resultInfo.addResultData(ResultInfoConst.RESULT_DATA, body));
+        } else {
+            ResultInfo resultInfo = ResultInfo.newInstance();
+            return resultInfo.addResultData(ResultInfoConst.RESULT_DATA, body);
         }
     }
 }
