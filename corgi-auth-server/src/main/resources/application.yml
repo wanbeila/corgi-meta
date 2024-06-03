@@ -18,8 +18,7 @@ spring:
       password: admin
 logging:
   file:
-    name: corgi-meta.log
-    path: logs/
+    path: logs/${spring.application.name}
   level:
     root: info
 springdoc:
