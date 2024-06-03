@@ -3,6 +3,7 @@ package cn.corgi.meta.base.advises;
 import cn.corgi.meta.base.bean.ResultInfo;
 import cn.corgi.meta.base.constants.ResultCodeEnum;
 import cn.corgi.meta.base.constants.ResultInfoConst;
+import com.nimbusds.jose.shaded.gson.Gson;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.MethodParameter;
 import org.springframework.http.MediaType;
@@ -38,7 +39,7 @@ public class DefaultControllerAdvise implements ResponseBodyAdvice<Object> {
             return body;
         } else {
             ResultInfo resultInfo = ResultInfo.newInstance();
-            return resultInfo.addResultData(ResultInfoConst.RESULT_DATA, body);
+            return new Gson().toJson(resultInfo.addResultData(ResultInfoConst.RESULT_DATA, body));
         }
     }
 }
