@@ -5,6 +5,7 @@ import cn.corgi.meta.auth.bean.AuthingWrapper;
 import cn.corgi.meta.auth.entity.User;
 import cn.corgi.meta.auth.service.JWTService;
 import cn.corgi.meta.auth.service.impl.DefaultUserDetailsService;
+import cn.corgi.meta.base.bean.ResultInfo;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
@@ -69,5 +70,11 @@ public class AuthingController {
             return authingVO;
         }
         throw new AccessDeniedException("invalid token！");
+    }
+
+    @PostMapping("logout")
+    @Operation(summary = "登出")
+    public ResultInfo logout() {
+        return ResultInfo.newInstance().setMessage("登出成功");
     }
 }

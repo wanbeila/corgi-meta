@@ -16,6 +16,8 @@ spring:
     user:
       name: admin
       password: admin
+  thymeleaf:
+    prefix: classpath:/static/
 logging:
   file:
     path: logs/${spring.application.name}

@@ -39,6 +39,11 @@ public class ResultInfo implements Serializable {
         return this;
     }
 
+    public ResultInfo setMessage(String message) {
+        this.message = message;
+        return this;
+    }
+
     public static ResultInfo newInstance() {
         return new ResultInfo();
     }

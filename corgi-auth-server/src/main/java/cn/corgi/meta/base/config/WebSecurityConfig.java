@@ -40,6 +40,7 @@ public class WebSecurityConfig {
                         authorize
                                 .requestMatchers("/authing/login").permitAll()
                                 .requestMatchers("/test/**").permitAll()
+                                .requestMatchers("/view/**").permitAll()
                                 .requestMatchers("/api/**").authenticated()
                                 .anyRequest().authenticated()
                 )
