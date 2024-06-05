@@ -1,0 +1,46 @@
+server:
+  port: 9999
+  servlet:
+    context-path: /corgi-meta
+  tomcat:
+    accesslog:
+      enabled: true
+      pattern: '%h %S %t "%r" %s %b %D'
+      max-days: 30
+    basedir: ${logging.file.path}/tomcat_logs
+spring:
+  application:
+    name: corgi-meta
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://${DATASOURCE_URL:localhost:3306}/${DATASOURCE_DBNAME:corgi_meta}?useUnicode=true&characterEncoding=utf-8&serverTimezone=UTC
+    username: ${DATASOURCE_USERNAME:root}
+    password: ${DATASOURCE_PASSWORD:egova}
+  liquibase:
+    change-log: db/changelog/database-changelog.yaml
+  security:
+    user:
+      name: admin
+      password: admin
+  thymeleaf:
+    prefix: classpath:/static/
+  data:
+    redis:
+      host: ${REDIS_HOST:127.0.0.1}
+      username: ${REDIS_USERNAME:root}
+      password: ${REDIS_PASSWORD:egovaredis}
+logging:
+  file:
+    path: logs/${spring.application.name}
+  level:
+    root: info
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
+knife4j:
+  enable: true
+  setting:
+    language: zh_cn
+corgi:
+  media:
+    root-path: /corgi-files/docx/
