@@ -2,18 +2,16 @@ package cn.corgi.meta.docx.controller;
 
 import cn.corgi.meta.base.config.MediaConfig;
 import cn.corgi.meta.docx.bean.DOCXBaseWrapper;
-import cn.corgi.meta.docx.bean.HaiMingWrapper;
+import cn.corgi.meta.docx.constant.ReplaceTypeEnum;
 import cn.corgi.meta.docx.entity.DOCXGenerateRecord;
 import cn.corgi.meta.docx.service.DOCXService;
 import cn.hutool.core.date.DateUtil;
 import io.swagger.v3.oas.annotations.Operation;
-import jakarta.servlet.ServletOutputStream;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
@@ -25,8 +23,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.io.*;
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
@@ -51,9 +47,9 @@ public class DOCXController {
 //        URL resource = this.getClass().getClassLoader().getResource("templates/NNC1_BRN.docx");
         String templateName = "";
         if (Objects.equals(docxBaseWrapper.getLangType(), 0)) {
-            templateName = HaiMingWrapper.EN_FILE_NAME;
+            templateName = docxBaseWrapper.EN_FILE_NAME();
         } else if (Objects.equals(docxBaseWrapper.getLangType(), 1)) {
-            templateName = HaiMingWrapper.CN_FILE_NAME;
+            templateName = docxBaseWrapper.CN_FILE_NAME();
         }
 
         if (StringUtils.isEmpty(templateName)) {
@@ -104,12 +100,14 @@ public class DOCXController {
         List<String> paragraphData = docxBaseWrapper.getParagraphData();
         List<String> tableData = docxBaseWrapper.getTableData();
 
+        ReplaceTypeEnum replaceType = docxBaseWrapper.replaceType();
+
         int pPos = 0;
         int tPos = 0;
 
         // 处理段落
         for (XWPFParagraph paragraph : paragraphs) {
-            pPos = replaceData(paragraphData, pPos, paragraph);
+            pPos = replaceData(paragraphData, pPos, paragraph, true, replaceType);
         }
         // 处理表格
         List<XWPFTable> tables = xwpfDocument.getTables();
@@ -120,7 +118,7 @@ public class DOCXController {
                 for (XWPFTableCell tableCell : tableCells) {
                     List<XWPFParagraph> para = tableCell.getParagraphs();
                     for (XWPFParagraph xwpfParagraph : para) {
-                        tPos = replaceData(tableData, tPos, xwpfParagraph);
+                        tPos = replaceData(tableData, tPos, xwpfParagraph, false, replaceType);
                     }
                 }
             }
@@ -142,25 +140,36 @@ public class DOCXController {
         return file;
     }
 
-    private static int replaceData(List<String> dataList, int pos, XWPFParagraph xwpfParagraph) {
+    private static int replaceData(List<String> dataList, int pos, XWPFParagraph xwpfParagraph, boolean isParagraph, ReplaceTypeEnum replaceType) {
         List<XWPFRun> runs = xwpfParagraph.getRuns();
         for (XWPFRun run : runs) {
-            if (matched(run.toString())) {
-                String tData = "";
+            if (matched(run, replaceType)) {
+                System.out.println((isParagraph ? "段落参数：" : "表格参数：") + run);
+                String data = "";
                 if (!CollectionUtils.isEmpty(dataList) && pos < dataList.size()) {
-                    tData = dataList.get(pos++);
+                    data = dataList.get(pos++);
                 }
-                run.setText(replaceText(run.toString(), tData), 0);
+                run.setText(replaceText(run.toString(), data, replaceType), 0);
+                if (Objects.equals(replaceType, ReplaceTypeEnum.RED_TEXT)) {
+                    // 这里要再改为黑色
+                    run.setColor(replaceType.getReplaceColor());
+                }
             }
         }
         return pos;
     }
 
-    private static boolean matched(String string) {
-        return string.matches("(\\{\\{.*}})");
+    private static boolean matched(XWPFRun run, ReplaceTypeEnum replaceType) {
+        if (Objects.equals(replaceType, ReplaceTypeEnum.RED_TEXT)) {
+            return Objects.equals(run.getColor(), replaceType.getColor());
+        }
+        return run.toString().matches("(\\{\\{.*}})");
     }
 
-    public static String replaceText(String text, String replaceText) {
+    public static String replaceText(String text, String replaceText, ReplaceTypeEnum replaceType) {
+        if (Objects.equals(replaceType, ReplaceTypeEnum.RED_TEXT)) {
+            return replaceText;
+        }
         if (text.matches("(\\{\\{.*}})")) {
             return text.replaceAll("(\\{\\{.*}})", replaceText);
         }

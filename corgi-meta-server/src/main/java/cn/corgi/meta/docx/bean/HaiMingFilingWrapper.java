@@ -7,13 +7,13 @@ import lombok.Data;
  * @author wanbeila
  * @date 2024/5/30
  */
-@JsonTypeName(value = "haiming")
+@JsonTypeName(value = "haiming-filing")
 @Data
-public class HaiMingWrapper extends DOCXBaseWrapper {
+public class HaiMingFilingWrapper extends DOCXBaseWrapper {
 
-    private static final String FILE_NAME = "haiming-32-";
-    public static final String EN_FILE_NAME = "haiming-32-en.docx";
-    public static final String CN_FILE_NAME = "haiming-32-cn.docx";
+    private static final String FILE_NAME = "海銘備案";
+    public static final String EN_FILE_NAME = "海銘備案.docx";
+    public static final String CN_FILE_NAME = "海銘備案.docx";
 
     @Override
     public String EN_FILE_NAME() {
