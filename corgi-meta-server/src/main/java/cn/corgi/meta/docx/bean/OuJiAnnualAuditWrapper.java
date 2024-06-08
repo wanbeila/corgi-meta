@@ -1,5 +1,6 @@
 package cn.corgi.meta.docx.bean;
 
+import cn.corgi.meta.docx.constant.ReplaceTypeEnum;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import lombok.Data;
 
@@ -7,9 +8,9 @@ import lombok.Data;
  * @author wanbeila
  * @date 2024/5/30
  */
-@JsonTypeName(value = "ouji")
+@JsonTypeName(value = "ouji-annualAudit")
 @Data
-public class OuJiWrapper extends DOCXBaseWrapper {
+public class OuJiAnnualAuditWrapper extends DOCXBaseWrapper {
 
     private static final String FILE_NAME = "歐記A516-年審";
     public static final String EN_FILE_NAME = "歐記A516-年審英文.docx";
@@ -23,5 +24,10 @@ public class OuJiWrapper extends DOCXBaseWrapper {
     @Override
     public String CN_FILE_NAME() {
         return CN_FILE_NAME;
+    }
+
+    @Override
+    public ReplaceTypeEnum replaceType() {
+        return ReplaceTypeEnum.RED_TEXT;
     }
 }

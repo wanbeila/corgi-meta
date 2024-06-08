@@ -15,18 +15,26 @@ import java.util.List;
  */
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.EXISTING_PROPERTY, property = "fileName")
 @JsonSubTypes({
+        // 备案
         @JsonSubTypes.Type(value = HaiMingFilingWrapper.class, name = "haiming-filing"),
-        @JsonSubTypes.Type(value = OuJiFilingWrapper.class, name = "ouji-filing")})
+        @JsonSubTypes.Type(value = OuJiFilingWrapper.class, name = "ouji-filing"),
+        // 注册
+        @JsonSubTypes.Type(value = HaiMingRegisterWrapper.class, name = "haiming-register"),
+        @JsonSubTypes.Type(value = OuJiRegisterWrapper.class, name = "ouji-register"),
+        // 年审
+        @JsonSubTypes.Type(value = HaiMingAnnualAuditWrapper.class, name = "haiming-annualAudit"),
+        @JsonSubTypes.Type(value = OuJiAnnualAuditWrapper.class, name = "ouji-annualAudit"),
+        // 改股改董
+        @JsonSubTypes.Type(value = ChangeStakeHolderWrapper.class, name = "changeStakeHolder"),
+        // 注销
+        @JsonSubTypes.Type(value = UnRegisterWrapper.class, name = "unregister"),
+})
 @Data
 public class DOCXBaseWrapper implements Serializable {
 
     @Serial
     private static final long serialVersionUID = -8921341252434741050L;
 
-    /**
-     * 用于序列化
-     */
-    private String fileName = "base";
     /**
      * 0 英文 1 中文
      */

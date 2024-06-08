@@ -29,6 +29,16 @@ spring:
       host: ${REDIS_HOST:127.0.0.1}
       username: ${REDIS_USERNAME:root}
       password: ${REDIS_PASSWORD:egovaredis}
+      jedis:
+        pool:
+          enabled: true
+          max-active: 8
+          max-wait: 100
+          max-idle: 8
+          min-idle: 2
+  redis:
+    redisson:
+      file: classpath:redisson.yml
 logging:
   file:
     path: logs/${spring.application.name}

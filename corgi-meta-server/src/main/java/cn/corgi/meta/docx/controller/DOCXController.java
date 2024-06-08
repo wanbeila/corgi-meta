@@ -23,10 +23,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.io.*;
-import java.util.Date;
-import java.util.List;
-import java.util.Objects;
-import java.util.UUID;
+import java.util.*;
 
 /**
  * @author wanbeila
@@ -143,6 +140,7 @@ public class DOCXController {
     private static int replaceData(List<String> dataList, int pos, XWPFParagraph xwpfParagraph, boolean isParagraph, ReplaceTypeEnum replaceType) {
         List<XWPFRun> runs = xwpfParagraph.getRuns();
         for (XWPFRun run : runs) {
+//            System.out.println(run);
             if (matched(run, replaceType)) {
                 System.out.println((isParagraph ? "段落参数：" : "表格参数：") + run);
                 String data = "";
@@ -160,7 +158,12 @@ public class DOCXController {
     }
 
     private static boolean matched(XWPFRun run, ReplaceTypeEnum replaceType) {
+        // 优先使用变量匹配
         if (Objects.equals(replaceType, ReplaceTypeEnum.RED_TEXT)) {
+            // 颜色匹配模式，混合变量匹配
+            if (run.toString().matches("(\\{\\{.*}})")) {
+                return true;
+            }
             return Objects.equals(run.getColor(), replaceType.getColor());
         }
         return run.toString().matches("(\\{\\{.*}})");
