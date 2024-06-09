@@ -1,6 +1,6 @@
 package cn.corgi.meta.auth.filter;
 
-import cn.corgi.meta.auth.service.JWTService;
+import cn.corgi.meta.auth.service.impl.JWTService;
 import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;

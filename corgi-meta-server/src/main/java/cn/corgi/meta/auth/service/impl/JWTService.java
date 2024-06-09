@@ -1,13 +1,16 @@
-package cn.corgi.meta.auth.service;
+package cn.corgi.meta.auth.service.impl;
 
 import cn.corgi.meta.auth.config.AuthingConfig;
 import cn.corgi.meta.base.util.RedisUtils;
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
@@ -16,21 +19,33 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Function;
 
 /**
  * @author wanbeila
  * @date 2024/5/30
  */
+@Slf4j
 @RequiredArgsConstructor
 @Component
 public class JWTService {
 
     public static final String SECRET = "357638792F423F4428472B4B6250655368566D597133743677397A2443264629";
 
+    private static final String TOKEN_PREFIX = "corgi:token:";
+
     private final AuthingConfig authingConfig;
 
     public String extractUsername(String token) {
+        // 这里修改为检查redis中token是否过期
+        String username = extractClaim(token, Claims::getSubject);
+        Boolean hasKey = RedisUtils.getStringRedisTemplate().hasKey(TOKEN_PREFIX + username);
+        if (Boolean.FALSE.equals(hasKey)) {
+            throw new ExpiredJwtException(null, null, "token已过期！");
+        }
+        // 自动续期
+        RedisUtils.getStringRedisTemplate().expire(TOKEN_PREFIX + username, authingConfig.getTokenExpire(), TimeUnit.SECONDS);
         return extractClaim(token, Claims::getSubject);
     }
 
@@ -68,15 +83,23 @@ public class JWTService {
         return createToken(claims, username);
     }
 
-    public String generateTokenV2(String username) {
+    public String generateTokenWithLock(String username) {
         Map<String, Object> claims = new HashMap<>();
-        String token = null;
+        AtomicReference<String> atomicToken = new AtomicReference<>();
         // 如果redis已存在token，则直接返回
-//        RedisUtils.doWithLock(username, () -> {
-//            token = createToken(claims, username);
-//            RedisUtils.getStringRedisTemplate().opsForValue().set(username, token, authingConfig.getTokenExpire(), TimeUnit.SECONDS);
-//        });
-        return createToken(claims, username);
+        RedisUtils.doWithLock(username, () -> {
+            String token = RedisUtils.getStringRedisTemplate().opsForValue().get(TOKEN_PREFIX + username);
+            if (StringUtils.isNotEmpty(token)) {
+                atomicToken.set(token);
+            } else {
+                log.info("生成新的token");
+                String newToken = createToken(claims, username);
+                atomicToken.set(newToken);
+                log.info("redis缓存token={}", newToken);
+                RedisUtils.getStringRedisTemplate().opsForValue().set(TOKEN_PREFIX + username, newToken, authingConfig.getTokenExpire(), TimeUnit.SECONDS);
+            }
+        });
+        return atomicToken.get();
     }
 
 

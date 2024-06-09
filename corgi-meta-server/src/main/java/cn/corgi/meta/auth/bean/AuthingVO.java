@@ -1,5 +1,6 @@
 package cn.corgi.meta.auth.bean;
 
+import cn.corgi.meta.auth.entity.Role;
 import lombok.Data;
 
 import java.util.ArrayList;
@@ -20,13 +21,5 @@ public class AuthingVO {
     private String token;
 
     private String homePath = "/dashboard/workbench";
-    private List<Map<String, Object>> roles;
-
-    public AuthingVO() {
-        roles = new ArrayList<>();
-        Map<String, Object> data = new HashMap<>();
-        data.put("roleName", "Common User");
-        data.put("value", "common");
-        roles.add(data);
-    }
+    private List<Role> roles;
 }

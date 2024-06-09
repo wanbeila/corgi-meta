@@ -1,6 +1,7 @@
 package cn.corgi.meta.base.util;
 
 import cn.corgi.meta.base.context.ApplicationContextHolder;
+import cn.corgi.meta.base.lock.InLockFunction;
 import lombok.Getter;
 import org.redisson.Redisson;
 import org.redisson.api.RLock;
@@ -33,12 +34,12 @@ public class RedisUtils {
         REDISSON = ApplicationContextHolder.getApplicationContext().getBean(Redisson.class);
     }
 
-    public static void doWithLock(String lockKey, Consumer<Object> doFunc) {
+    public static void doWithLock(String lockKey, InLockFunction function) {
         RLock lock = REDISSON.getLock(lockKey);
         try {
             lock.lock();
 
-            doFunc.accept(null);
+            function.doWithLock();
 
         } finally {
             lock.unlock();

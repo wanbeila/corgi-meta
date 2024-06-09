@@ -2,6 +2,7 @@ package cn.corgi.meta.auth.service.impl;
 
 import cn.corgi.meta.auth.domain.UserMapper;
 import cn.corgi.meta.auth.entity.User;
+import cn.corgi.meta.base.exception.GlobalException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -19,6 +20,9 @@ public class DefaultUserDetailsService implements UserDetailsService {
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         User userByUsername = userMapper.getUserByUsername(username);
+        if (userByUsername == null) {
+            throw new GlobalException("用户不存在！");
+        }
         return userByUsername;
     }
 }

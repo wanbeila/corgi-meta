@@ -3,8 +3,8 @@ package cn.corgi.meta.auth.controller;
 import cn.corgi.meta.auth.bean.AuthingVO;
 import cn.corgi.meta.auth.bean.AuthingWrapper;
 import cn.corgi.meta.auth.entity.User;
-import cn.corgi.meta.auth.service.JWTService;
-import cn.corgi.meta.auth.service.impl.DefaultUserDetailsService;
+import cn.corgi.meta.auth.service.IUserService;
+import cn.corgi.meta.auth.service.impl.JWTService;
 import cn.corgi.meta.base.bean.ResultInfo;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -35,6 +35,7 @@ public class AuthingController {
 
     private final AuthenticationManager authenticationManager;
     private final JWTService jwtService;
+    private final IUserService userService;
 
     @PostMapping("login")
     @Operation(summary = "登录")
@@ -43,14 +44,15 @@ public class AuthingController {
         Authentication authenticate = authenticationManager.authenticate(authenticationRequest);
         log.info("authenticate {}", authenticate);
         if (authenticate.isAuthenticated()) {
-            String token = jwtService.generateToken(authingWrapper.getUsername());
             Object userObj = authenticate.getPrincipal();
             AuthingVO authingVO = new AuthingVO();
-            authingVO.setToken(token);
             if (userObj instanceof User user) {
                 authingVO.setUsername(user.getUsername());
                 authingVO.setUserId(user.getId());
+                userService.fillUserInfo(authingVO);
             }
+            String token = jwtService.generateTokenWithLock(authingWrapper.getUsername());
+            authingVO.setToken(token);
             return authingVO;
         }
         throw new UsernameNotFoundException("invalid user request！");

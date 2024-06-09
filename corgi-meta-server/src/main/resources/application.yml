@@ -18,6 +18,7 @@ spring:
     password: ${DATASOURCE_PASSWORD:egova}
   liquibase:
     change-log: db/changelog/database-changelog.yaml
+
   security:
     user:
       name: admin

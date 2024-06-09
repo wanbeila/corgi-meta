@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <changeSet id="0001" author="w">
+        <comment>角色表</comment>
+        <sql>
+            DROP TABLE IF EXISTS user;
+            DROP TABLE IF EXISTS role;
+            DROP TABLE IF EXISTS user_role;
+            DROP TABLE IF EXISTS docx_generate_record;
+
+            CREATE TABLE user
+            (
+                id      bigint(0) NOT NULL AUTO_INCREMENT,
+                username varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL,
+                name     varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL,
+                password varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL,
+                PRIMARY KEY (id) USING BTREE
+            ) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = Dynamic;
+
+            CREATE TABLE role
+            (
+                id    bigint(0) NOT NULL AUTO_INCREMENT,
+                name  varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL,
+                value varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL,
+                PRIMARY KEY (id) USING BTREE
+            ) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = Dynamic;
+
+            CREATE TABLE user_role
+            (
+                user_id bigint(0) NOT NULL,
+                role_id bigint(0) NOT NULL,
+                PRIMARY KEY (user_id, role_id) USING BTREE
+            ) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = Dynamic;
+
+            CREATE TABLE docx_generate_record
+            (
+                id          bigint                                  NOT NULL AUTO_INCREMENT,
+                filename    varchar(200) COLLATE utf8mb4_general_ci NOT NULL,
+                file_path   varchar(500) COLLATE utf8mb4_general_ci NOT NULL,
+                create_time varchar(500) COLLATE utf8mb4_general_ci NOT NULL,
+                PRIMARY KEY (id)
+            ) ENGINE=InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = Dynamic;
+        </sql>
+    </changeSet>
+
+    <changeSet id="0002" author="w">
+        <sql>
+            truncate table user;
+            truncate table role;
+            truncate table user_role;
+
+            INSERT INTO user(id, username, password, name)
+            VALUES (1, 'admin', 'admin', 'admin');
+            INSERT INTO user(id, username, password, name)
+            VALUES (2, 'ouji', 'ouji', 'ouji');
+
+            INSERT INTO role(id, name, value)
+            VALUES (1, 'admin', 'super');
+            INSERT INTO role(id, name, value)
+            VALUES (2, 'common user', 'common');
+
+            INSERT INTO user_role(user_id, role_id)
+            VALUES (1, 1);
+            INSERT INTO user_role(user_id, role_id)
+            VALUES (2, 2);
+        </sql>
+    </changeSet>
+</databaseChangeLog>

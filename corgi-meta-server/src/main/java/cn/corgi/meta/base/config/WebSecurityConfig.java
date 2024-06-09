@@ -2,10 +2,9 @@ package cn.corgi.meta.base.config;
 
 import cn.corgi.meta.auth.domain.UserMapper;
 import cn.corgi.meta.auth.filter.JWTAuthFilter;
-import cn.corgi.meta.auth.service.JWTService;
+import cn.corgi.meta.auth.service.impl.JWTService;
 import cn.corgi.meta.auth.service.impl.DefaultPasswordEncoder;
 import cn.corgi.meta.auth.service.impl.DefaultUserDetailsService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
