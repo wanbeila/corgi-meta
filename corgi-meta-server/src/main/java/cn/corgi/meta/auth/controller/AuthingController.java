@@ -68,6 +68,7 @@ public class AuthingController {
             if (userObj instanceof User user) {
                 authingVO.setUsername(user.getUsername());
                 authingVO.setUserId(user.getId());
+                userService.fillUserInfo(authingVO);
             }
             return authingVO;
         }

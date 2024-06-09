@@ -70,4 +70,17 @@
             VALUES (2, 2);
         </sql>
     </changeSet>
+
+    <changeSet id="0003" author="w">
+        <sql>
+            INSERT INTO user(id, username, password, name)
+            VALUES (3, 'test', 'test', 'test');
+
+            INSERT INTO role(id, name, value)
+            VALUES (3, 'test', 'test');
+
+            INSERT INTO user_role(user_id, role_id)
+            VALUES (3, 3);
+        </sql>
+    </changeSet>
 </databaseChangeLog>

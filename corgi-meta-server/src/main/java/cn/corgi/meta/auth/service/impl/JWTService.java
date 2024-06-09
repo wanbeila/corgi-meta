@@ -33,6 +33,7 @@ public class JWTService {
 
     public static final String SECRET = "357638792F423F4428472B4B6250655368566D597133743677397A2443264629";
 
+    private static final String LOCK_PREFIX = "corgi:lock:";
     private static final String TOKEN_PREFIX = "corgi:token:";
 
     private final AuthingConfig authingConfig;
@@ -87,7 +88,7 @@ public class JWTService {
         Map<String, Object> claims = new HashMap<>();
         AtomicReference<String> atomicToken = new AtomicReference<>();
         // 如果redis已存在token，则直接返回
-        RedisUtils.doWithLock(username, () -> {
+        RedisUtils.doWithLock(LOCK_PREFIX + username, () -> {
             String token = RedisUtils.getStringRedisTemplate().opsForValue().get(TOKEN_PREFIX + username);
             if (StringUtils.isNotEmpty(token)) {
                 atomicToken.set(token);

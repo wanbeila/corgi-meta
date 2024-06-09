@@ -158,6 +158,9 @@ public class DOCXController {
     }
 
     private static boolean matched(XWPFRun run, ReplaceTypeEnum replaceType) {
+        if (StringUtils.isEmpty(run.toString().trim())) {
+            return false;
+        }
         // 优先使用变量匹配
         if (Objects.equals(replaceType, ReplaceTypeEnum.RED_TEXT)) {
             // 颜色匹配模式，混合变量匹配
